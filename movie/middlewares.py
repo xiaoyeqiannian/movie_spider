@@ -6,6 +6,30 @@
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+import random
+from scrapy.downloadermiddlewares.useragent import UserAgentMiddleware
+
+class MyUserAgentMiddleware(UserAgentMiddleware):
+    """
+    随机user agent
+    """
+    def __init__(self, user_agent):
+        self.user_agent = user_agent
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        if crawler.spider.name == 'info1':
+            return cls(user_agent=crawler.settings.get('USER_AGENT'))
+        elif crawler.spider.name == 'douban':
+            return cls(user_agent=crawler.settings.get('USER_AGENT'))
+        elif crawler.spider.name == 'endata':
+            return cls(user_agent=crawler.settings.get('USER_AGENT'))
+        elif crawler.spider.name == 'douban_explore':
+            return cls(user_agent=crawler.settings.get('USER_AGENT'))
+
+    def process_request(self, request, spider):
+        agent = random.choice(self.user_agent)
+        request.headers['User-Agent'] = agent
 
 
 class MovieSpiderMiddleware(object):
@@ -64,7 +88,6 @@ class MovieDownloaderMiddleware(object):
     @classmethod
     def from_crawler(cls, crawler):
         # This method is used by Scrapy to create your spiders.
-        print('--------from_crawler')
         s = cls()
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
         return s
@@ -79,7 +102,20 @@ class MovieDownloaderMiddleware(object):
         # - or return a Request object
         # - or raise IgnoreRequest: process_exception() methods of
         #   installed downloader middleware will be called
-        print('--------process_request')
+        if spider.name == 'info1':
+            request.cookies = {
+                'uuid_n_v':'v1',
+                'uuid':'508AE6E0AF7B11EA909D9FF2C00A78C337E5547100DC4DDAB455934FD2713087',
+                '_csrf':'3be37af580e9381ef3c89de0bce66a3ad8589ef7aaf7bd7c3ef26823931e6192',
+                '_lxsdk':'508AE6E0AF7B11EA909D9FF2C00A78C337E5547100DC4DDAB455934FD2713087',
+                'Hm_lvt_703e94591e87be68cc8da0da7cbd0be2':1592275484,
+                'mojo-uuid':'2f5dd10335e7f2ab210e6a7a985b483f',
+                'mojo-session-id':{"id":"bf55f1e7491154feeed5890538a8abf1","time":1592281050666},
+                '__mta':'247321275.1592275483847.1592281123551.1592281127159.16',
+                'Hm_lpvt_703e94591e87be68cc8da0da7cbd0be2':'592281128',
+                'mojo-trace-id':16,
+                '_lxsdk_s':'172bb58add1-502-e91-780%7C%7C25'
+            }
         return None
 
     def process_response(self, request, response, spider):
@@ -89,7 +125,6 @@ class MovieDownloaderMiddleware(object):
         # - return a Response object
         # - return a Request object
         # - or raise IgnoreRequest
-        print('--------process_response')
         return response
 
     def process_exception(self, request, exception, spider):
@@ -100,7 +135,6 @@ class MovieDownloaderMiddleware(object):
         # - return None: continue processing this exception
         # - return a Response object: stops process_exception() chain
         # - return a Request object: stops process_exception() chain
-        print('--------process_exception')
         pass
 
     def spider_opened(self, spider):
