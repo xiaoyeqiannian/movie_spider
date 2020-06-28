@@ -46,3 +46,11 @@ class Info1(scrapy.Item):
     show_time = scrapy.Field() # 公映日期
     box_office = scrapy.Field() # 总票房
     video_online = scrapy.Field() # 在线视频站
+
+class CommentItem(scrapy.Item):
+    id = scrapy.Field()
+    nickname = scrapy.Field()
+    userid = scrapy.Field()
+    star = scrapy.Field() # 评论星
+    comment_time  = scrapy.Field() # 评论时间
+    comment_vote = scrapy.Field() # 有用

@@ -26,6 +26,8 @@ class MyUserAgentMiddleware(UserAgentMiddleware):
             return cls(user_agent=crawler.settings.get('USER_AGENT'))
         elif crawler.spider.name == 'douban_explore':
             return cls(user_agent=crawler.settings.get('USER_AGENT'))
+        elif crawler.spider.name == 'douban_comment':
+            return cls(user_agent=crawler.settings.get('USER_AGENT_ONE'))
 
     def process_request(self, request, spider):
         agent = random.choice(self.user_agent)
@@ -104,17 +106,11 @@ class MovieDownloaderMiddleware(object):
         #   installed downloader middleware will be called
         if spider.name == 'info1':
             request.cookies = {
-                'uuid_n_v':'v1',
-                'uuid':'508AE6E0AF7B11EA909D9FF2C00A78C337E5547100DC4DDAB455934FD2713087',
-                '_csrf':'3be37af580e9381ef3c89de0bce66a3ad8589ef7aaf7bd7c3ef26823931e6192',
-                '_lxsdk':'508AE6E0AF7B11EA909D9FF2C00A78C337E5547100DC4DDAB455934FD2713087',
-                'Hm_lvt_703e94591e87be68cc8da0da7cbd0be2':1592275484,
-                'mojo-uuid':'2f5dd10335e7f2ab210e6a7a985b483f',
-                'mojo-session-id':{"id":"bf55f1e7491154feeed5890538a8abf1","time":1592281050666},
-                '__mta':'247321275.1592275483847.1592281123551.1592281127159.16',
-                'Hm_lpvt_703e94591e87be68cc8da0da7cbd0be2':'592281128',
-                'mojo-trace-id':16,
-                '_lxsdk_s':'172bb58add1-502-e91-780%7C%7C25'
+
+            }
+        if spider.name == 'douban_comment':
+            request.cookies = {
+
             }
         return None
 
