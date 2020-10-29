@@ -1,6 +1,7 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import xlwt
+import xlrd
 
 class MoviePipeline(object):
 
@@ -8,6 +9,9 @@ class MoviePipeline(object):
         self.spider_out = []
 
     def process_item(self, item, spider):
+        for i in self.spider_out:
+            if i.get('userid') == item['userid']:
+                return item
         self.spider_out.append(dict(item))
         return item
 
@@ -31,15 +35,34 @@ class MoviePipeline(object):
                 ])
             self.save2xls(spider.name, ret, ('国家', '页码', '影片名称', '豆瓣名称', '出品公司', '发行公司', '公映日期', '总票房', '在线视频站'))
         elif spider.name == 'douban_comment':
+            matchs = []
+            hasID = []
+            try:
+                __matchs = xlrd.open_workbook(r'douban_comment.xls')
+                _matchs = __matchs.sheet_by_index(0)
+                for index in range(_matchs.nrows-1):
+                    matchs.append([_matchs.row_values(index+1)[0],
+                                _matchs.row_values(index+1)[1],
+                                _matchs.row_values(index+1)[2],
+                                _matchs.row_values(index+1)[3],
+                                _matchs.row_values(index+1)[4],
+                                _matchs.row_values(index+1)[5]])
+                    hasID.append(_matchs.row_values(index+1)[1])
+            except:
+                pass
             for v in self.spider_out:
-                ret.append([
+                if v.get('userid') in hasID:
+                    continue
+                print(v.get('userid'), '+++')
+                matchs.append([
                     v.get('nickname'),
                     v.get('userid'),
                     v.get('star'),
                     v.get('comment_time'),
-                    v.get('comment_vote')
+                    v.get('comment_vote'),
+                    v.get('comment')
                 ])
-            self.save2xls(spider.name, ret, ('昵称', 'id', '评分', '评论时间', '有用'))
+            self.save2xls(spider.name, matchs, ('昵称', 'id', '评分', '评论时间', '有用', '内容'))
 
     def save2xls(self, name, data, xls_header):
         workbook = xlwt.Workbook(encoding = 'ascii')

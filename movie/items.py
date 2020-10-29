@@ -54,3 +54,8 @@ class CommentItem(scrapy.Item):
     star = scrapy.Field() # 评论星
     comment_time  = scrapy.Field() # 评论时间
     comment_vote = scrapy.Field() # 有用
+    comment = scrapy.Field() #评论
+
+class People(scrapy.Item):
+    id = scrapy.Field()
+    name = scrapy.Field()
